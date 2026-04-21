@@ -3,6 +3,11 @@
 Веб-приложение для управления заказами на перевозку в стиле Transportation Management System.
 Основной сценарий: диспетчер видит список заказов, фильтрует/сортирует, меняет статусы, работает с черновиками и редактирует заказ.
 
+[Ссылка на деплой 🔗](https://order-managment-dashboard-test.vercel.app/orders)
+
+<img width="800" height="434" alt="ScreenRecording2026-04-21at18 20 34-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/7f13cecc-5827-4410-82ba-1112abd83f4c" />
+
+
 ## Быстрый старт
 
 ```bash
