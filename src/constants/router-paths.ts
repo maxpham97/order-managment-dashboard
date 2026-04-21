@@ -1,3 +1,4 @@
 export const ROUTERS_PATHS = {
-    ORDER: '/order',
-};
+    ORDERS: '/orders',
+    ORDERS_NEW: '/orders/new',
+} as const;

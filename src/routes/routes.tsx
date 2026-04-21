@@ -2,33 +2,16 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ROUTERS_PATHS } from "../constants/router-paths";
 
-const OrderPage = lazy(() => import("../pages/order"));
-
-interface IRoutesState {
-    path: string;
-    component: React.ComponentType;
-}
+const OrdersPage = lazy(() => import("../pages/order"));
 
 export const RenderRoutes = () => {
     return (
-        <Suspense fallback={"loading..."}>
+        <Suspense fallback={null}>
             <Routes>
-                <Route path="/" element={<Navigate to={ROUTERS_PATHS.ORDER} replace />} />
-                {routes.map((route: IRoutesState, index: number) => {
-                    const Component = route.component;
-                    return (
-                        <Route
-                            key={index}
-                            path={route.path}
-                            element={
-                                <Component />
-                            }
-                        />
-                    );
-                })}
+                <Route path="/" element={<Navigate to={ROUTERS_PATHS.ORDERS} replace />} />
+                <Route path={ROUTERS_PATHS.ORDERS} element={<OrdersPage />} />
+                <Route path={`${ROUTERS_PATHS.ORDERS}/*`} element={<OrdersPage />} />
             </Routes>
         </Suspense>
     );
 };
-
-const routes: IRoutesState[] = [{ component: OrderPage, path: ROUTERS_PATHS.ORDER }];
