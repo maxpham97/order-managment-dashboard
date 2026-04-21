@@ -9,7 +9,7 @@ import { StopItem } from "./StopItem";
 
 interface StopsSectionProps {
     register: UseFormRegister<DraftFormValues>;
-    control: Control<DraftFormValues>;
+    control: Control<DraftFormValues, any, any>;
     errors: FieldErrors<DraftFormValues>;
 }
 

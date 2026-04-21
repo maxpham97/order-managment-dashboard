@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOrder, useUpdateOrder } from "../../api/order/orderQueries";
-import { buildOrderDetailPath, ROUTERS_PATHS } from "../../constants/router-paths";
+import { buildOrderDetailPath } from "../../constants/router-paths";
 import { EditOrderForm } from "../../features/order-edit/components/EditOrderForm";
 import type { DraftFormValues } from "../../features/order-new/schema/order-draft.schema";
 import { orderToFormValues } from "../../lib/utils/order-form.utils";

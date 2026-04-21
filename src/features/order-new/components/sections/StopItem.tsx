@@ -19,7 +19,7 @@ interface StopItemProps {
     index: number;
     total: number;
     register: UseFormRegister<DraftFormValues>;
-    control: Control<DraftFormValues>;
+    control: Control<DraftFormValues, any, any>;
     errors: FieldErrors<DraftFormValues>;
     onRemove: () => void;
     onMoveUp: () => void;
@@ -27,11 +27,6 @@ interface StopItemProps {
     canRemove: boolean;
 }
 
-const STOP_ACCENT: Record<string, string> = {
-    pick_up: "border-l-emerald-500",
-    drop_off: "border-l-red-500",
-    stop: "border-l-blue-400",
-};
 
 export function StopItem({
     index,
@@ -45,7 +40,6 @@ export function StopItem({
     canRemove,
 }: StopItemProps) {
     const stopErrors = errors.stops?.[index];
-    const typeValue = undefined; // read from form
 
     return (
         <div

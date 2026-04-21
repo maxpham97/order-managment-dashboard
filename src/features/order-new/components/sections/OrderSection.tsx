@@ -16,7 +16,7 @@ import type { Carrier } from "../../../../types/order/order-types";
 
 interface OrderSectionProps {
     register: UseFormRegister<DraftFormValues>;
-    control: Control<DraftFormValues>;
+    control: Control<DraftFormValues, any, any>;
     errors: FieldErrors<DraftFormValues>;
 }
 
@@ -94,7 +94,7 @@ export function OrderSection({ register, control, errors }: OrderSectionProps) {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <FormField label="Rate ($)" required error={errors.rate?.message}>
                     <Input
-                        {...register("rate")}
+                        {...register("rate", { valueAsNumber: true })}
                         type="number"
                         min={0}
                         placeholder="1250"
@@ -104,7 +104,7 @@ export function OrderSection({ register, control, errors }: OrderSectionProps) {
 
                 <FormField label="Weight (lbs)" required error={errors.weight?.message}>
                     <Input
-                        {...register("weight")}
+                        {...register("weight", { valueAsNumber: true })}
                         type="number"
                         min={0}
                         placeholder="12000"

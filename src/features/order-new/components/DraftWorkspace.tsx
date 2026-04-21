@@ -34,7 +34,7 @@ export function DraftWorkspace() {
         return () => clearTimeout(timer);
     }, [activeTab?.savedAt]);
 
-    const handleSubmit = async (values: DraftFormValues) => {
+    const handleSubmit = async (_values: DraftFormValues) => {
         setIsSubmitting(true);
         try {
             // Placeholder: send to API, then navigate back

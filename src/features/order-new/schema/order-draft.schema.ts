@@ -22,12 +22,8 @@ export const orderDraftSchema = z.object({
     carrierMcNumber: z.string(),
     equipmentType: z.enum(["dry_van", "reefer", "flatbed", "step_deck"]),
     loadType: z.enum(["ftl", "ltl"]),
-    rate: z.coerce
-        .number({ error: "Must be a number" })
-        .min(1, "Rate is required"),
-    weight: z.coerce
-        .number({ error: "Must be a number" })
-        .min(1, "Weight is required"),
+    rate: z.number({ error: "Must be a number" }).min(1, "Rate is required"),
+    weight: z.number({ error: "Must be a number" }).min(1, "Weight is required"),
     notes: z.string().optional(),
     stops: z
         .array(stopSchema)
