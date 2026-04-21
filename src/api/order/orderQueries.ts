@@ -26,9 +26,12 @@ export const useCarriers = () =>
 export const useUpdateOrderStatus = () => {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, status }: Parameters<typeof orderService.updateOrderStatus>[0] extends string
-            ? { id: string; status: Parameters<typeof orderService.updateOrderStatus>[1] }
-            : never) => orderService.updateOrderStatus(id, status),
+        mutationFn: ({
+            id,
+            status,
+            reason,
+        }: { id: string; status: Parameters<typeof orderService.updateOrderStatus>[1]; reason?: string }) =>
+            orderService.updateOrderStatus(id, status, reason),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: queryKeys.orders.all });
         },
@@ -41,6 +44,18 @@ export const useDeleteOrder = () => {
         mutationFn: (id: string) => orderService.deleteOrder(id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: queryKeys.orders.all });
+        },
+    });
+};
+
+export const useUpdateOrder = () => {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, values }: { id: string; values: Parameters<typeof orderService.updateOrder>[1] }) =>
+            orderService.updateOrder(id, values),
+        onSuccess: (_, { id }) => {
+            qc.invalidateQueries({ queryKey: queryKeys.orders.detail(id) });
+            qc.invalidateQueries({ queryKey: queryKeys.orders.lists() });
         },
     });
 };

@@ -55,7 +55,7 @@ interface ColumnsConfig {
     currentSort: string;
     sortOrder: "asc" | "desc";
     onSort: (field: string) => void;
-    onStatusChange: (orderId: string, status: OrderStatus) => void;
+    onStatusChange: (orderId: string, status: OrderStatus, reason?: string) => Promise<void> | void;
     onView: (order: Order) => void;
     onEdit: (order: Order) => void;
     onDuplicate: (order: Order) => void;

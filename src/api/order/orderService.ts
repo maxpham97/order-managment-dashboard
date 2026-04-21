@@ -1,5 +1,6 @@
 import { maybeThrow, networkDelay } from "../../lib/mock/network.mock";
 import { MOCK_CARRIERS, MOCK_ORDERS } from "../../lib/mock/order/orders.mock";
+import type { DraftFormValues } from "../../features/order-new/schema/order-draft.schema";
 import type { Order } from "../../types/order/order";
 import type { OrderStatus } from "../../types/order/order-types";
 
@@ -75,14 +76,29 @@ class OrderService {
         return resolveStatus(order);
     };
 
-    updateOrderStatus = async (id: string, status: OrderStatus): Promise<Order> => {
+    updateOrderStatus = async (
+        id: string,
+        status: OrderStatus,
+        reason?: string,
+    ): Promise<Order> => {
         await networkDelay();
         maybeThrow();
 
         const order = MOCK_ORDERS.find((o) => o.id === id);
         if (!order) throw new Error(`Order "${id}" not found`);
 
+        const current = resolveStatus(order);
+        if (current.status === status) return current;
+
         statusOverrides.set(id, status);
+        order.statusHistory.push({
+            from: current.status,
+            to: status,
+            changedAt: new Date().toISOString(),
+            note: reason?.trim() ? reason.trim() : undefined,
+        });
+        order.updatedAt = new Date().toISOString();
+
         return resolveStatus(order);
     };
 
@@ -94,6 +110,45 @@ class OrderService {
         if (idx === -1) throw new Error(`Order "${id}" not found`);
         MOCK_ORDERS.splice(idx, 1);
         statusOverrides.delete(id);
+    };
+
+    updateOrder = async (id: string, values: DraftFormValues): Promise<Order> => {
+        await networkDelay();
+        maybeThrow();
+
+        const idx = MOCK_ORDERS.findIndex((o) => o.id === id);
+        if (idx === -1) throw new Error(`Order "${id}" not found`);
+
+        const existing = MOCK_ORDERS[idx];
+        const carrier = MOCK_CARRIERS.find((c) => c.id === values.carrierId) ?? existing.carrier;
+
+        MOCK_ORDERS[idx] = {
+            ...existing,
+            clientName: values.clientName,
+            referenceNumber: values.referenceNumber,
+            carrier,
+            equipmentType: values.equipmentType,
+            loadType: values.loadType,
+            rate: Number(values.rate),
+            weight: Number(values.weight),
+            notes: values.notes ?? "",
+            stops: values.stops.map((s, i) => ({
+                id: s.id,
+                type: s.type,
+                order: i + 1,
+                address: { city: s.city, state: s.state, zip: s.zip },
+                locationName: s.locationName || undefined,
+                refNumber: s.refNumber || undefined,
+                appointmentType: s.appointmentType,
+                appointmentDate: s.appointmentDate && s.appointmentTime
+                    ? `${s.appointmentDate}T${s.appointmentTime}:00`
+                    : s.appointmentDate || null,
+                notes: s.notes || undefined,
+            })),
+            updatedAt: new Date().toISOString(),
+        };
+
+        return resolveStatus(MOCK_ORDERS[idx]);
     };
 
     getCarriers = async () => {

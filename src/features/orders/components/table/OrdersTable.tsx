@@ -10,12 +10,12 @@ import {
     DataTablePagination,
     DataTableSkeleton,
 } from "@/components/data-table";
+import { toast } from "sonner";
 import { useDeleteOrder, useOrders, useUpdateOrderStatus } from "../../../../api/order/orderQueries";
 import type { OrderSortField } from "../../../../api/order/orderService";
 import { ROUTERS_PATHS } from "../../../../constants/router-paths";
 import type { Order } from "../../../../types/order/order";
 import type { OrderStatus } from "../../../../types/order/order-types";
-import { useLocalDrafts } from "../../hooks/useLocalDrafts";
 import type { OrdersTableState, OrdersTableActions } from "../../hooks/useOrdersTableState";
 import { getOrderColumns } from "./columns";
 import { OrdersTableToolbar } from "./OrdersTableToolbar";
@@ -26,7 +26,9 @@ type OrdersTableProps = Pick<
     OrdersTableState,
     "page" | "pageSize" | "sortBy" | "sortOrder" | "statuses" | "search" | "debouncedSearch"
 > &
-    Pick<OrdersTableActions, "setPage" | "setPageSize" | "setSorting" | "toggleStatus" | "setSearch" | "clearFilters" | "hasActiveFilters">;
+    Pick<OrdersTableActions, "setPage" | "setPageSize" | "setSorting" | "toggleStatus" | "setSearch" | "clearFilters" | "hasActiveFilters"> & {
+        onDuplicateDraft: (order: Order) => void;
+    };
 
 export function OrdersTable({
     page,
@@ -43,9 +45,9 @@ export function OrdersTable({
     setSearch,
     clearFilters,
     hasActiveFilters,
+    onDuplicateDraft,
 }: OrdersTableProps) {
     const navigate = useNavigate();
-    const { saveDraft } = useLocalDrafts();
 
     const { data, isLoading, isError, error, refetch } = useOrders({
         page,
@@ -56,28 +58,22 @@ export function OrdersTable({
         search: debouncedSearch,
     });
 
-    const { mutate: updateStatus } = useUpdateOrderStatus();
+    const { mutateAsync: updateStatus } = useUpdateOrderStatus();
     const { mutate: deleteOrder, variables: deletingId } = useDeleteOrder();
 
-    const handleStatusChange = (orderId: string, status: OrderStatus) => {
-        updateStatus({ id: orderId, status });
+    const handleStatusChange = async (orderId: string, status: OrderStatus, reason?: string) => {
+        try {
+            await updateStatus({ id: orderId, status, reason });
+            toast.success(`Status changed to ${status.replace("_", " ")}`);
+        } catch (e) {
+            toast.error((e as Error)?.message ?? "Failed to update status");
+            throw e;
+        }
     };
 
     const handleDuplicate = (order: Order) => {
-        saveDraft(
-            {
-                referenceNumber: `${order.referenceNumber}-COPY`,
-                clientName: order.clientName,
-                carrier: order.carrier,
-                equipmentType: order.equipmentType,
-                loadType: order.loadType,
-                weight: order.weight,
-                rate: order.rate,
-                notes: order.notes,
-                stops: [],
-            },
-            `Copy of ${order.referenceNumber}`,
-        );
+        onDuplicateDraft(order);
+        toast.success(`Draft created from ${order.referenceNumber}`);
     };
 
     const columns = getOrderColumns({

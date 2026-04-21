@@ -7,11 +7,29 @@ import { LocalDraftsSection } from "../../features/orders/components/LocalDrafts
 import { OrdersTable } from "../../features/orders/components/table/OrdersTable";
 import { useLocalDrafts } from "../../features/orders/hooks/useLocalDrafts";
 import { useOrdersTableState } from "../../features/orders/hooks/useOrdersTableState";
+import type { Order } from "../../types/order/order";
 
 export default function OrdersPage() {
     const navigate = useNavigate();
     const tableState = useOrdersTableState();
-    const { drafts, discardDraft, discardAll } = useLocalDrafts();
+    const { drafts, saveDraft, discardDraft, discardAll } = useLocalDrafts();
+
+    const handleDuplicateDraft = (order: Order) => {
+        saveDraft(
+            {
+                referenceNumber: `${order.referenceNumber}-COPY`,
+                clientName: order.clientName,
+                carrier: order.carrier,
+                equipmentType: order.equipmentType,
+                loadType: order.loadType,
+                weight: order.weight,
+                rate: order.rate,
+                notes: order.notes,
+                stops: [],
+            },
+            `Copy of ${order.referenceNumber}`,
+        );
+    };
 
     return (
         <div className="min-h-screen bg-background">
@@ -22,7 +40,7 @@ export default function OrdersPage() {
 
                 {/* Page header */}
                 <div className="relative overflow-hidden rounded-xl border border-border bg-card px-6 py-5 shadow-sm">
-                    <div className="absolute inset-0 bg-linear-to-r from-primary/[0.06] via-primary/[0.02] to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-r from-primary/6 via-primary/2 to-transparent pointer-events-none" />
                     <div className="relative flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
@@ -71,7 +89,7 @@ export default function OrdersPage() {
                         </span>
                     </div>
                     <div className="p-5">
-                        <OrdersTable {...tableState} />
+                        <OrdersTable {...tableState} onDuplicateDraft={handleDuplicateDraft} />
                     </div>
                 </div>
             </div>
